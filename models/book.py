@@ -13,7 +13,13 @@ book_categories = Table(
     "book_categories",
     Base.metadata,
     Column("book_id", ForeignKey('books.id'), primary_key=True),
-    Column("category_id", ForeignKey("categories.id", primary_key=True))
+    Column("category_id", ForeignKey("categories.id"), primary_key=True)
+)
+publisher = Table(
+    "publisher",
+    Base.metadata,
+    Column("book_id", ForeignKey('books.id'), Primary_key=True),
+    Column("publisher_id", ForeignKey("publisher.id"), primary_key=True)
 )
 
 class Book(BaseModel, Base):
@@ -35,5 +41,8 @@ class Book(BaseModel, Base):
         secondary=book_categories,
         back_populates="books"
     )
-    languages = relationship()
-    publisher = relationship()
+    publisher = relationship(
+        "Publisher",
+        secondary=publisher,
+        back_populates="books"
+    )

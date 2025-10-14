@@ -1,19 +1,19 @@
 openapi: 3.0.0
 info:
-  title: "Books Inventory API"
-  description: "A books Inventory API that keeps stock of books"
-  versio: "1.0.0"
+  title: 'Books Inventory API'
+  description: 'A books Inventory API that keeps stock of books'
+  version: 1.0.0
 
-server:
-  - url: "/api"
+servers:
+  - url: '/api'
 
 paths:
   /books:
     get:
-      operationId: "books.read_all"
+      operationId: api.books.read_all
       tags:
-        - "Books"
-      Summary: "Read the list of books"
+        - 'Books'
+      summary: 'Read the list of books'
       responses:
-        "200":
-          description: "Sucessfully read books list"
+        '200':
+          description: 'Sucessfully read books list'
