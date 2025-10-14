@@ -1,6 +1,8 @@
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, Integer, ForeignKey, Table, DateTime, Float
 from sqlalchemy.orm import relationship
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from marshmallow import fields
 
 book_authors = Table(
     "book_authors",
@@ -14,12 +16,6 @@ book_categories = Table(
     Base.metadata,
     Column("book_id", ForeignKey('books.id'), primary_key=True),
     Column("category_id", ForeignKey("categories.id"), primary_key=True)
-)
-publisher = Table(
-    "publisher",
-    Base.metadata,
-    Column("book_id", ForeignKey('books.id'), Primary_key=True),
-    Column("publisher_id", ForeignKey("publisher.id"), primary_key=True)
 )
 
 class Book(BaseModel, Base):
@@ -41,8 +37,16 @@ class Book(BaseModel, Base):
         secondary=book_categories,
         back_populates="books"
     )
-    publisher = relationship(
-        "Publisher",
-        secondary=publisher,
-        back_populates="books"
-    )
+    publisher_id = Column(Integer, ForeignKey("publishers.id", ondelete="RESTRICT"), nullable=True)
+
+    publisher = relationship("Publisher", back_populates="books")
+
+class BookSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Book
+        load_instance = True
+        include_fk = True
+
+    title = fields.String(required=True)
+    isbn = fields.String(required=True)
+    publisher_id = fields.Integer(required=False, allow_none=True)
