@@ -60,7 +60,10 @@ def create_app(config_name: str | None = None) -> Flask:
 
     # Register blueprints (only 'health' for Step 1)
     from .health import bp as health_bp
+    from .books import bp as books_bp
+
     app.register_blueprint(health_bp, url_prefix="/api/v1")
+    app.register_blueprint(books_bp, url_prefix="/api/v1")
 
     # Ensure the DB session is removed at the end of each request/app context
     @app.teardown_appcontext
