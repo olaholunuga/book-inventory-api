@@ -101,3 +101,7 @@ class DBStorage:
     def close(self):
         """Remove session (for API teardown)"""
         self.__session.remove()
+    
+    # expose the SQLAlchemy session for advanced querying (joins, filters, etc.)
+    def get_session(self):
+        return self.__session
