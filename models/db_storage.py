@@ -2,14 +2,14 @@ from models.book import Book
 from models.author import Author
 from models.category import Category
 from models.publisher import Publisher
+from models.inventory_transaction import InventoryTransaction
 import sqlalchemy
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from os import getenv
 from models.base_model import Base
 from dotenv import load_dotenv
-
 
 load_dotenv()
 # Map model names for easy querying
@@ -18,7 +18,9 @@ classes = {
     "Author": Author,
     "Category": Category,
     "Publisher": Publisher,
+    "InventoryTransaction": InventoryTransaction,
 }
+
 
 class DBStorage:
     __engine = None
@@ -31,8 +33,15 @@ class DBStorage:
         if ENV == "dev":
             # SQLite for development
             self.__engine = create_engine("sqlite:///book-store.db", echo=True)
+            # Enable SQLite foreign keys (needed for ON DELETE RESTRICT/CASCADE)
+            if self.__engine.url.get_backend_name() == "sqlite":
+                @event.listens_for(self.__engine, "connect")
+                def _set_sqlite_pragma(dbapi_connection, connection_record):
+                    cursor = dbapi_connection.cursor()
+                    cursor.execute("PRAGMA foreign_keys=ON")
+                    cursor.close()
         else:
-            # PostgreSQL / MySQL for production (DATABASE_URL should be like: postgresql://user:pass@host/dbname)
+            # Production (DATABASE_URL should be like: postgresql://user:pass@host/dbname)
             DATABASE_URL = getenv("DATABASE_URL")
             self.__engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 
@@ -70,7 +79,7 @@ class DBStorage:
             raise
 
     def delete(self, obj=None):
-        """Delete object if exists"""
+        """Delete object if exists (hard delete)"""
         if obj:
             self.__session.delete(obj)
 
