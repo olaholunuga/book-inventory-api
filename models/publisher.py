@@ -1,25 +1,17 @@
-from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
-from models.base_model import BaseModel, Base
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from marshmallow import fields, validates, ValidationError
+from sqlalchemy import Column, String, Index
 
-class Publisher(BaseModel, Base):
+from models.base_model import BaseModel, Base, SoftDeleteMixin
+
+
+class Publisher(SoftDeleteMixin, BaseModel, Base):
     __tablename__ = "publishers"
+
     name = Column(String(128), nullable=False, unique=True)
 
-    # Publisher has many books, but deleting publisher should not cascade delete books
-    books = relationship("Book", back_populates="publisher", cascade="all, delete-orphan", passive_deletes=True)
+    # Do NOT cascade delete books. Book.publisher_id has ON DELETE RESTRICT.
+    books = relationship("Book", back_populates="publisher")
 
-class PublisherSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = Publisher
-        load_instance = True  # Enables deserialization to model
-        include_fk = True     # To load publisher_id if needed
-
-    name = fields.String(required=True, validate=lambda x: len(x) >= 2)
-
-    @validates("name")
-    def validate_name(self, value):
-        if not value.strip():
-            raise ValidationError("Publisher name cannot be empty.")
+    __table_args__ = (
+        Index("ix_publishers_name", "name"),
+    )
