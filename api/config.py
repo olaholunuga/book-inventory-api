@@ -21,6 +21,8 @@ class BaseConfig:
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
+    # In dev, propagate exceptions so our error handler has full context
+    PROPAGATE_EXCEPTIONS = True
 
 
 class ProductionConfig(BaseConfig):
