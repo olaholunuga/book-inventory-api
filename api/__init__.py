@@ -64,7 +64,7 @@ def create_app(config_name: str | None = None) -> Flask:
     from .transactions import bp as tx_bp
     from .authors import bp as authors_bp
     from .categories import bp as categories_bp
-    from publishers import bp as publishers_bp
+    from .publishers import bp as publishers_bp
 
     app.register_blueprint(health_bp, url_prefix="/api/v1")
     app.register_blueprint(books_bp, url_prefix="/api/v1")

@@ -98,14 +98,20 @@ def apply_filters(query):
 
     # M2M joins when needed
     if author_id:
-        query = query.join(book_authors, book_authors.c.book_id == Book.id).join(
-            Author, Author.id == book_authors.c.author_id
-        ).filter(Author.id == author_id)
+        query = (
+            query.join(book_authors, book_authors.c.book_id == Book.id)
+                 .join(Author, Author.id == book_authors.c.author_id)
+                 .filter(Author.deleted_at.is_(None))
+                 .filter(Author.id == author_id)
+        )
 
     if category_id:
-        query = query.join(book_categories, book_categories.c.book_id == Book.id).join(
-            Category, Category.id == book_categories.c.category_id
-        ).filter(Category.id == category_id)
+        query = (
+            query.join(book_categories, book_categories.c.book_id == Book.id)
+                 .join(Category, Category.id == book_categories.c.category_id)
+                 .filter(Category.deleted_at.is_(None))
+                 .filter(Category.id == category_id)
+        )
 
     if publisher_id:
         query = query.filter(Book.publisher_id == publisher_id)
@@ -138,13 +144,13 @@ def apply_filters(query):
         # outerjoin authors so we can OR across both, and distinct to dedupe
         query = (
             query.outerjoin(book_authors, book_authors.c.book_id == Book.id)
-            .outerjoin(Author, Author.id == book_authors.c.author_id)
-            .filter(
-                or_(
-                    func.lower(Book.title).like(qnorm),
-                    func.lower(Author.name).like(qnorm),
-                )
-            )
+                 .outerjoin(Author, Author.id == book_authors.c.author_id)
+                 .filter(
+                     or_(
+                         func.lower(Book.title).like(qnorm),
+                         and_(Author.deleted_at.is_(None), func.lower(Author.name).like(qnorm)),
+                     )
+                 )
         )
 
     return query
