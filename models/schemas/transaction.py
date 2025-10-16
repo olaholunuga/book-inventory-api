@@ -8,7 +8,7 @@ class InventoryTransactionCreateSchema(Schema):
     note = fields.String(required=False, allow_none=True, validate=lambda s: s is None or len(s) <= 255)
 
     @validates("delta_quantity")
-    def _validate_delta(self, value):
+    def _validate_delta(self, value, **kwargs):
         if value == 0:
             raise ValidationError("delta_quantity cannot be zero.")
 
