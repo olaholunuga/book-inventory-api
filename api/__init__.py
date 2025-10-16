@@ -63,11 +63,13 @@ def create_app(config_name: str | None = None) -> Flask:
     from .books import bp as books_bp
     from .transactions import bp as tx_bp
     from .authors import bp as authors_bp
+    from categories import bp as categories_bp
 
     app.register_blueprint(health_bp, url_prefix="/api/v1")
     app.register_blueprint(books_bp, url_prefix="/api/v1")
     app.register_blueprint(tx_bp, url_prefix="/api/v1/")
     app.register_blueprint(authors_bp, url_prefix="/api/v1/")
+    app.register_blueprint(categories_bp, url_prefix="/api/v1/")
 
     # Ensure the DB session is removed at the end of each request/app context
     @app.teardown_appcontext
