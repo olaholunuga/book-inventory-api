@@ -26,21 +26,21 @@ class BookBaseSchema(Schema):
     updated_at = fields.DateTime(dump_only=True)
 
     @validates("published_date")
-    def _validate_published_date(self, value):
+    def _validate_published_date(self, value, **kwargs):
         validate_not_future(value)
 
     @validates("pages")
-    def _validate_pages(self, value):
+    def _validate_pages(self, value, **kwargs):
         if value is not None and value < 1:
             raise ValidationError("pages must be >= 1.")
 
     @validates("quantity")
-    def _validate_quantity(self, value):
+    def _validate_quantity(self, value, **kwargs):
         if value is not None and value < 0:
             raise ValidationError("quantity must be >= 0.")
 
     @validates("price")
-    def _validate_price(self, value):
+    def _validate_price(self, value, **kwargs):
         # marshmallow passes strings here; use helper to validate and ensure >= 0
         if value is not None:
             to_decimal_2(value)
@@ -71,21 +71,21 @@ class BookUpdateSchema(Schema):
     category_ids = fields.List(fields.String(), load_only=True, required=False)
 
     @validates("published_date")
-    def _validate_published_date(self, value):
+    def _validate_published_date(self, value, **kwargs):
         validate_not_future(value)
 
     @validates("pages")
-    def _validate_pages(self, value):
+    def _validate_pages(self, value, **kwargs):
         if value is not None and value < 1:
             raise ValidationError("pages must be >= 1.")
 
     @validates("quantity")
-    def _validate_quantity(self, value):
+    def _validate_quantity(self, value, **kwargs):
         if value is not None and value < 0:
             raise ValidationError("quantity must be >= 0.")
 
     @validates("price")
-    def _validate_price(self, value):
+    def _validate_price(self, value, **kwargs):
         if value is not None:
             to_decimal_2(value)
 
