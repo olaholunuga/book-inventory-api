@@ -1,10 +1,7 @@
-"""
-Centralized error handling that returns your standard error envelope:
-{ "error": "<CODE>", "message": "<human readable>", "details": { ... }, "status": <http status int> }
-"""
-from flask import jsonify
+from flask import jsonify, current_app
 from werkzeug.exceptions import HTTPException
 from marshmallow import ValidationError
+from sqlalchemy.exc import IntegrityError
 
 
 def error_response(error: str, message: str, status: int, details: dict | None = None):
@@ -44,6 +41,22 @@ def register_error_handlers(app):
         # err.messages contains field-level details
         return error_response("VALIDATION_ERROR", "Invalid input", 422, details=err.messages)
 
+    # Integrity errors (unique constraints, FK violations, check constraints)
+    @app.errorhandler(IntegrityError)
+    def handle_integrity_error(err: IntegrityError):
+        # Rollback is managed where the session is used, but this ensures a clean response
+        message = str(getattr(err, "orig", err))
+        lower_msg = message.lower()
+        # Heuristics: tailor the status
+        if "unique constraint" in lower_msg or "unique violation" in lower_msg:
+            return error_response("CONFLICT", "Unique constraint violated.", 409, details={"db_error": message})
+        if "foreign key constraint" in lower_msg or "foreign key mismatch" in lower_msg:
+            return error_response("BAD_REQUEST", "Foreign key constraint failed.", 400, details={"db_error": message})
+        if "check constraint" in lower_msg or "constraint failed" in lower_msg:
+            return error_response("BAD_REQUEST", "Check constraint failed.", 400, details={"db_error": message})
+        # Generic integrity issue
+        return error_response("BAD_REQUEST", "Integrity error.", 400, details={"db_error": message})
+
     # Werkzeug HTTPExceptions map to their status codes
     @app.errorhandler(HTTPException)
     def handle_http_exception(err: HTTPException):
@@ -52,5 +65,14 @@ def register_error_handlers(app):
     # 500 Internal Error (catch-all)
     @app.errorhandler(Exception)
     def internal_error(err: Exception):
-        # In production you would log the exception with stack trace here
-        return error_response("INTERNAL_ERROR", "An unexpected error occurred", 500)
+        # In dev, include exception details to speed up debugging
+        details = None
+        if current_app and current_app.debug:
+            details = {"type": err.__class__.__name__, "message": str(err)}
+        return error_response("INTERNAL_ERROR", "An unexpected error occurred", 500, details=details)
+
+    # # 500 Internal Error (catch-all)
+    # @app.errorhandler(Exception)
+    # def internal_error(err: Exception):
+    #     # In production you would log the exception with stack trace here
+    #     return error_response("INTERNAL_ERROR", "An unexpected error occurred", 500)
