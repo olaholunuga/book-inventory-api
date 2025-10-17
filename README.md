@@ -14,7 +14,7 @@ This README serves both API users and developers. It explains how to run the pro
 ## Table of Contents
 
 - [Features](#features)
-- [Quick Start (API Users)](#quick-start-api-users)
+- [Quick Start](#quick-start)
   - [Health](#health)
   - [Books](#books)
   - [Transactions](#transactions)
@@ -69,7 +69,7 @@ This README serves both API users and developers. It explains how to run the pro
 
 ---
 
-## Quick Start (API Users)
+## Quick Start
 
 When the server is running (see developer setup below), browse to:
 - Swagger UI: http://localhost:8000/apidocs/
@@ -297,7 +297,7 @@ Examples:
 
 ---
 
-## Installation (Developers)
+## Installation
 
 ### Requirements
 
