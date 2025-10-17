@@ -213,3 +213,28 @@ def delete_category(category_id: str):
         abort(404)
     c.delete()  # Soft delete via mixin
     return ("", 204)
+
+@bp.post("categories/<category_id>/restore")
+def restore_category(category_id: str):
+    """
+    restores all soft-deleted categories
+    ---
+    tags: [categories]
+    parameters:
+      - in: path
+        name: category_id
+        type: string
+        required: true
+    responces:
+      200: { description: Restored }
+      404: { description: Not found }
+    """
+    session = storage.get_session()
+    c = session.query(Category).get(category_id)
+    if not c:
+        abort(404)
+    # Enforce active uniqueness on restore
+    if c.deleted_at is not None and exists_name_case_insensitive(session, c.name, exclude_id=c.id):
+        abort(409, description="Another active category with the same name exists.")
+    c.restore()
+    return jsonify({"data": out_schema.dump(c)})

@@ -202,7 +202,7 @@ def delete_author(author_id: str):
     a.delete()
     return ("", 204)
 
-@bp.patch("/authors/<author_id>/restore")
+@bp.post("/authors/<author_id>/restore")
 def restore_author(author_id: str):
     """restores any deleted author
     ---
