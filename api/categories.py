@@ -219,7 +219,7 @@ def restore_category(category_id: str):
     """
     restores all soft-deleted categories
     ---
-    tags: [categories]
+    tags: [Categories]
     parameters:
       - in: path
         name: category_id

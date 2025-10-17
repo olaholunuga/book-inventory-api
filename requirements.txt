@@ -1,8 +1,8 @@
-Flask==2.3.3
+Flask==3.1.2
 flasgger==0.9.7.1
-flask-cors==4.0.0
-python-dotenv==1.0.1
-SQLAlchemy==2.0.34
-marshmallow==3.21.3
+Flask-Cors==6.0.1
+SQLAlchemy==2.0.44
+marshmallow==4.0.1
+python-dotenv==1.1.1
 alembic==1.17.0
 psycopg2-binary==2.9.11

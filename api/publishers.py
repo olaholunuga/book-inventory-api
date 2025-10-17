@@ -215,3 +215,29 @@ def delete_publisher(publisher_id: str):
         abort(404)
     p.delete()  # Soft delete via mixin
     return ("", 204)
+
+
+@bp.post("/publishers/<publisher_id>/restore")
+def restore_publisher(publisher_id: str):
+    """
+    Restore a soft-deleted publisher
+    ---
+    tags: [Publishers]
+    parameters:
+      - in: path
+        name: publisher_id
+        type: string
+        required: true
+    responses:
+      200: { description: Restored }
+      404: { description: Not found }
+      409: { description: Active publisher with same name exists }
+    """
+    session = storage.get_session()
+    p = session.query(Publisher).get(publisher_id)
+    if not p:
+        abort(404)
+    if p.deleted_at is not None and exists_name_case_insensitive(session, p.name, exclude_id=p.id):
+        abort(409, description="Another active publisher with the same name exists.")
+    p.restore()
+    return jsonify({"data": out_schema.dump(p)})
