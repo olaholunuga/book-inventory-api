@@ -201,3 +201,25 @@ def delete_author(author_id: str):
     # Soft delete via mixin override
     a.delete()
     return ("", 204)
+
+@bp.patch("/authors/<author_id>/restore")
+def restore_author(author_id: str):
+    """restores any deleted author
+    ---
+    tags: [Authors]
+    parameters:
+      - in: path
+        name: author_id
+        type: string
+        required: true
+    responses:
+      200: { description: Restored }
+      404: { description: Not found }
+    """
+    session = storage.get_session()
+    a = session.query(Author).get(author_id)
+    if not a:
+      abort(404)
+    # restores the formerlly deleted author
+    a.restore()
+    return jsonify({"data": out_schema.dump(a)})

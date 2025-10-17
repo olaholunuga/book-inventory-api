@@ -132,6 +132,13 @@ class SoftDeleteMixin:
 
     deleted_at = Column(DateTime(timezone=True), nullable=True)
 
+    def restore(self):
+        """restores an instance; sets delete_at to null and commits
+        """
+        self.deleted_at = None
+        models.storage.new(self)
+        models.storage.save()
+
     def soft_delete(self):
         """Explicit soft delete helper; sets deleted_at and commits."""
         self.deleted_at = datetime.utcnow()

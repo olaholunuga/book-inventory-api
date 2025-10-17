@@ -108,3 +108,18 @@ class BookOutSchema(Schema):
     publisher_id = fields.String(allow_none=True)
     created_at = fields.DateTime()
     updated_at = fields.DateTime()
+    # Expose IDs of related entities
+    author_ids = fields.Method("get_author_ids")
+    category_ids = fields.Method("get_category_ids")
+
+    def get_author_ids(self, obj):
+        try:
+            return [a.id for a in getattr(obj, "authors", [])]
+        except Exception:
+            return []
+
+    def get_category_ids(self, obj):
+        try:
+            return [c.id for c in getattr(obj, "categories", [])]
+        except Exception:
+            return []
