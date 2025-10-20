@@ -9,7 +9,7 @@ from models import storage  # DBStorage singleton (scoped_session) you already h
 
 # Minimal Swagger config: exposes /swagger.json and UI at /apidocs
 SWAGGER_TEMPLATE = {
-    "swagger": "2.0",
+    "swagger": "3.0.0",
     "info": {
         "title": "Book Inventory API",
         "version": "1.0.0",
