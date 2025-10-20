@@ -3,6 +3,7 @@ from models.author import Author
 from models.category import Category
 from models.publisher import Publisher
 from models.inventory_transaction import InventoryTransaction
+from models.user import User
 import sqlalchemy
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -19,6 +20,7 @@ classes = {
     "Category": Category,
     "Publisher": Publisher,
     "InventoryTransaction": InventoryTransaction,
+    "User": User
 }
 
 

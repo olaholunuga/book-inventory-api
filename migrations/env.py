@@ -1,10 +1,15 @@
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
+import os
+import sys
 
+
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
 # Import your models' Base
 from models.base_model import Base  # metadata target
-import os
 
 # this is the Alembic Config object, which provides access to the values within the .ini file in use.
 config = context.config

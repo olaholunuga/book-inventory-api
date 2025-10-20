@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 
 
 class User(BaseModel, Base):
-    __tablename__ = "user"
+    __tablename__ = "users"
     f_name = Column(String(255), nullable=True)
     l_name = Column(String(255), nullable=True)
     email = Column(String(255), nullable=False, unique=True)
