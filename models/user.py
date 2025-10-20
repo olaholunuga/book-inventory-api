@@ -17,3 +17,7 @@ class User(BaseModel, Base):
         uselist=False,
         passive_deletes=True
     )
+
+    @property
+    def password(self):
+        raise AttributeError("Password: Write-only field")

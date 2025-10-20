@@ -2,6 +2,7 @@ from flask import Flask
 from flasgger import Swagger
 from flask_cors import CORS
 import os
+from argon2 import PasswordHasher
 
 from .config import get_config
 from .errors import register_error_handlers
@@ -34,6 +35,8 @@ SWAGGER_CONFIG = {
     "swagger_ui": True,
     "specs_route": "/apidocs/",
 }
+
+ph = PasswordHasher()
 
 
 def create_app(config_name: str | None = None) -> Flask:
