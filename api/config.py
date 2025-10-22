@@ -5,6 +5,7 @@ Database URL is handled by your DBStorage for now; we'll align in Step 2.
 """
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 load_dotenv()  # Read .env if present
 
@@ -17,6 +18,12 @@ class BaseConfig:
     CORS_ORIGINS = os.getenv("CORS_ORIGINS", "*")
     # Keep a copy of env for visibility
     APP_ENV = os.getenv("APP_ENV", "dev")
+    # Added jwt configurations
+    JWT_SECRET = os.getenv("JWT_SECRET", "dev-secret-change-me")
+    JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+    ACCESS_TOKEN_EXPIRES = timedelta(seconds=int(os.getenv("ACCESS_TOKEN_EXPIRES_SECONDS", "900")))
+    REFRESH_TOKEN_EXPIRES = timedelta(seconds=int(os.getenv("REFRESH_TOKEN_EXPIRES_SECONDS", "1209600")))
+    ALLOWED_ROLES = os.getenv("ALLOWED_ROLES", "admin,author,user").split(",")
 
 
 class DevelopmentConfig(BaseConfig):

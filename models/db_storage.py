@@ -11,6 +11,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from os import getenv
 from models.base_model import Base
 from dotenv import load_dotenv
+from models.refresh_token import RefreshToken
 
 load_dotenv()
 # Map model names for easy querying
@@ -20,7 +21,8 @@ classes = {
     "Category": Category,
     "Publisher": Publisher,
     "InventoryTransaction": InventoryTransaction,
-    "User": User
+    "User": User,
+    "RefreshToken": RefreshToken
 }
 
 
