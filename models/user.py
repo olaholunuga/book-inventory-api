@@ -1,5 +1,5 @@
 from models.base_model import Base, BaseModel
-from sqlalchemy import Column, String, Integer, Boolean, ForeignKey
+from sqlalchemy import Column, String, Boolean
 from sqlalchemy.orm import relationship
 
 
@@ -7,7 +7,7 @@ class User(BaseModel, Base):
     __tablename__ = "users"
     f_name = Column(String(255), nullable=True)
     l_name = Column(String(255), nullable=True)
-    email = Column(String(255), nullable=False, unique=True)
+    email = Column(String(255), nullable=False, unique=True, index=True)
     password_hash = Column(String(100), nullable=False)
     admin = Column(Boolean, default=False)
 
