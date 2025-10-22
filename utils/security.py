@@ -56,6 +56,19 @@ def create_access_token(subject: str, jti: str = None) -> str:
     }
     return jwt.encode(payload, current_app.config["JWT_SECRET"], algorithm=current_app.config["JWT_ALGORITHM"])
 
+def create_refresh_token(subject: str, jti: str = None) -> str:
+    jti = jti or generate_jti()
+    exp = _now() + current_app.config["REFRESH_TOKEN_EXPIRES"]
+    payload = {
+        "iss": current_app.config.get("JWT_ISSUER", "book-inventory-api"),
+        "sub": str(subject),
+        "iat": int(_now().timestamp()),
+        "exp": int(exp.timestamp()),
+        "type": "refresh",
+        "jti": jti,
+    }
+    return jwt.encode(payload, current_app.config["JWT_SECRET"], algorithm=current_app.config["JWT_ALGORITHM"])
+
 def decode_token(token: str, expected_type: str = "access") -> Dict[str, Any]:
     """
     Decode and validate a JWT. Raises exception on invalid signature/expired jwt
