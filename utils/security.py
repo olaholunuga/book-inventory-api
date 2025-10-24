@@ -44,7 +44,7 @@ def create_access_token(subject: str, jti: str = None) -> str:
 
     """
     jti = jti or generate_jti()
-    exp = _now() + current_app.config["ACESS_TOKEN_EXPIRES"]
+    exp = _now() + current_app.config["ACCESS_TOKEN_EXPIRES"]
     payload = {
         "iss": current_app.config.get("JWT_ISSUER", "book-inventory-api"),
         "sub": str(subject),

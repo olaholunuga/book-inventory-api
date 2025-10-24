@@ -10,7 +10,7 @@ from models import storage  # DBStorage singleton (scoped_session) you already h
 
 # Minimal Swagger config: exposes /swagger.json and UI at /apidocs
 SWAGGER_TEMPLATE = {
-    "swagger": "3.0.0",
+    "swagger": "2.0.0",
     "info": {
         "title": "Book Inventory API",
         "version": "1.0.0",
@@ -18,6 +18,14 @@ SWAGGER_TEMPLATE = {
     },
     "basePath": "/",  # We'll mount blueprints under /api/v1
     "schemes": ["http"],
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "Enter the token with the `Bearer ` prefix, e.g. \"Bearer abcde12345\"."
+        }
+    }
 }
 
 SWAGGER_CONFIG = {
@@ -68,6 +76,7 @@ def create_app(config_name: str | None = None) -> Flask:
     from .authors import bp as authors_bp
     from .categories import bp as categories_bp
     from .publishers import bp as publishers_bp
+    from .auth import bp as auth_bp
 
     app.register_blueprint(health_bp, url_prefix="/api/v1")
     app.register_blueprint(books_bp, url_prefix="/api/v1")
@@ -75,6 +84,7 @@ def create_app(config_name: str | None = None) -> Flask:
     app.register_blueprint(authors_bp, url_prefix="/api/v1/")
     app.register_blueprint(categories_bp, url_prefix="/api/v1/")
     app.register_blueprint(publishers_bp, url_prefix="/api/v1/")
+    app.register_blueprint(auth_bp, url_prefix="/api/v1/")
 
     # Ensure the DB session is removed at the end of each request/app context
     @app.teardown_appcontext
