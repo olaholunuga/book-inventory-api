@@ -12,6 +12,7 @@ from os import getenv
 from models.base_model import Base
 from dotenv import load_dotenv
 from models.refresh_token import RefreshToken
+from models.blacklisted_token import BlacklistedToken
 
 load_dotenv()
 # Map model names for easy querying
@@ -22,7 +23,8 @@ classes = {
     "Publisher": Publisher,
     "InventoryTransaction": InventoryTransaction,
     "User": User,
-    "RefreshToken": RefreshToken
+    "RefreshToken": RefreshToken,
+    "BlacklistedToken": BlacklistedToken
 }
 
 

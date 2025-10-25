@@ -44,7 +44,7 @@ def create_access_token(subject: str, jti: str = None) -> str:
 
     """
     jti = jti or generate_jti()
-    exp = _now() + current_app.config["ACCESS_TOKEN_EXPIRES"]
+    exp = _now() + current_app.config["JWT_TOKEN_EXPIRES"]
     payload = {
         "iss": current_app.config.get("JWT_ISSUER", "book-inventory-api"),
         "sub": str(subject),
@@ -56,9 +56,9 @@ def create_access_token(subject: str, jti: str = None) -> str:
     }
     return jwt.encode(payload, current_app.config["JWT_SECRET"], algorithm=current_app.config["JWT_ALGORITHM"])
 
-def create_refresh_token(subject: str, jti: str = None) -> str:
+def create_jwt_token(subject: str, jti: str = None) -> str:
     jti = jti or generate_jti()
-    exp = _now() + current_app.config["REFRESH_TOKEN_EXPIRES"]
+    exp = _now() + current_app.config["JWT_TOKEN_EXPIRES"]
     payload = {
         "iss": current_app.config.get("JWT_ISSUER", "book-inventory-api"),
         "sub": str(subject),

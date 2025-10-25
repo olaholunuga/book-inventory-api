@@ -21,8 +21,7 @@ class BaseConfig:
     # Added jwt configurations
     JWT_SECRET = os.getenv("JWT_SECRET", "dev-secret-change-me")
     JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
-    ACCESS_TOKEN_EXPIRES = timedelta(seconds=int(os.getenv("ACCESS_TOKEN_EXPIRES_SECONDS", "900")))
-    REFRESH_TOKEN_EXPIRES = timedelta(seconds=int(os.getenv("REFRESH_TOKEN_EXPIRES_SECONDS", "1209600")))
+    JWT_TOKEN_EXPIRES = timedelta(seconds=int(os.getenv("JWT_TOKEN_EXPIRES_SECONDS", "1209600")))
     ALLOWED_ROLES = os.getenv("ALLOWED_ROLES", "admin,author,user").split(",")
 
 

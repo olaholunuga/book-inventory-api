@@ -33,3 +33,19 @@ def jwt_required():
         return wrapper
 
     return decorator
+
+def roles_required(required_roles: list[str]):
+    def decorator(fn):
+        @wraps(fn)
+        @jwt_required()
+        def wrapper(*args, **kwargs):
+            user_roles = set(getattr(g, "current_user_roles", []))
+
+            # required_roles = set(required_roles or [])
+            if not set(required_roles).issubset(user_roles):
+                abort(403, description="Insuficient role")
+            return fn(*args, **kwargs)
+        
+        return wrapper
+    
+    return decorator

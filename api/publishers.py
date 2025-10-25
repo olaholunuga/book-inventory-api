@@ -5,6 +5,7 @@ from typing import Tuple
 from flask import Blueprint, request, jsonify, abort
 from marshmallow import ValidationError
 from sqlalchemy import func
+from utils.decorators import roles_required
 
 from models import storage
 from models.publisher import Publisher
@@ -54,11 +55,14 @@ def exists_name_case_insensitive(session, name: str, exclude_id: str | None = No
 
 
 @bp.post("/publishers")
+@roles_required(["admin"])
 def create_publisher():
     """
     Create a publisher
     ---
     tags: [Publishers]
+    security:
+      - Bearer: []
     consumes: [application/json]
     parameters:
       - in: body
@@ -155,11 +159,14 @@ def get_publisher(publisher_id: str):
 
 
 @bp.patch("/publishers/<publisher_id>")
+@roles_required(["admin"])
 def update_publisher(publisher_id: str):
     """
     Update a publisher (partial)
     ---
     tags: [Publishers]
+    security:
+      - Bearer: []
     parameters:
       - in: path
         name: publisher_id
@@ -193,6 +200,7 @@ def update_publisher(publisher_id: str):
 
 
 @bp.delete("/publishers/<publisher_id>")
+@roles_required(["admin"])
 def delete_publisher(publisher_id: str):
     """
     Soft delete a publisher (sets deleted_at)
@@ -200,6 +208,8 @@ def delete_publisher(publisher_id: str):
     Hard delete would be restricted if books reference this publisher.
     ---
     tags: [Publishers]
+    security:
+      - Bearer: []
     parameters:
       - in: path
         name: publisher_id
@@ -218,11 +228,14 @@ def delete_publisher(publisher_id: str):
 
 
 @bp.post("/publishers/<publisher_id>/restore")
+@roles_required(["admin"])
 def restore_publisher(publisher_id: str):
     """
     Restore a soft-deleted publisher
     ---
     tags: [Publishers]
+    security:
+      - Bearer: []
     parameters:
       - in: path
         name: publisher_id

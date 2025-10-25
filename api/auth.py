@@ -17,30 +17,34 @@ from __future__ import annotations
 
 from datetime import datetime
 import uuid
-
 from flask import Blueprint, request, jsonify, g, abort, current_app
 from marshmallow import ValidationError
+from typing import Tuple
+
 
 from models import storage
 from models.user import User
 from models.refresh_token import RefreshToken
-from models.schemas.user import UserCreateSchema, UserOutSchema, UserLoginSchema
+from models.schemas.user import UserCreateSchema, UserOutSchema, UserLoginSchema, UserListOutSchema
 
-from utils.decorators import jwt_required
+from utils.decorators import jwt_required, roles_required
 from utils.security import (
     hash_password,
     verify_password,
-    create_access_token,
-    create_refresh_token,
+    create_jwt_token,
     decode_token,
     generate_jti
 )
+
+MAX_LIMIT = 100
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 user_create_schema = UserCreateSchema()
 user_out_schema = UserOutSchema()
 user_login_schema = UserLoginSchema()
+user_list_out_schema = UserListOutSchema(many=True)
+
 
 
 @bp.post("/register")
@@ -127,27 +131,24 @@ def login():
     if not user or not verify_password(password, user.password_hash):
         abort(401, description="Invalid credential")
     
-    access_jti = generate_jti()
-    refresh_jti = generate_jti()
-    access_token = create_access_token(subject=str(user.id), jti=access_jti)
-    refresh_token = create_refresh_token(subject=str(user.id), jti=refresh_jti)
+    token_jti = generate_jti()
+    jwt_token = create_jwt_token(subject=str(user.id), jti=token_jti)
 
-    rft = RefreshToken(
-        jti=refresh_jti,
-        user_id=str(user.id),
-        revoked=False,
-        expires_at=datetime.utcnow() + current_app.config["REFRESH_TOKEN_EXPIRES"]
-    )
+    # rft = RefreshToken(
+    #     jti=refresh_jti,
+    #     user_id=str(user.id),
+    #     revoked=False,
+    #     expires_at=datetime.utcnow() + current_app.config["REFRESH_TOKEN_EXPIRES"]
+    # )
 
-    storage.new(rft)
-    storage.save()
+    # storage.new(rft)
+    # storage.save()
 
     return jsonify(
         {
-            "access_token": access_token,
-            "refresh_token": refresh_token,
+            "access_token": jwt_token,
             "token_type": "bearer",
-            "expires_in": int(current_app.config["ACCESS_TOKEN_EXPIRES"].total_seconds())
+            "expires_in": int(current_app.config["JWT_TOKEN_EXPIRES"].total_seconds())
         }
     ), 200
 
@@ -177,38 +178,53 @@ def refresh():
     rt.revoked = True
     storage.new(rt)
 
-    new_access_jti = generate_jti()
-    new_refresh_jti = generate_jti()
-    new_access = create_access_token(sub=decoded["sub"], jti=new_access_jti)
-    new_refresh = create_refresh_token(sub=decoded["sub"], jti=new_refresh_jti)
+    new_token_jti = generate_jti()
+    new_jwt = create_jwt_token(sub=decoded["sub"], jti=new_token_jti)
     
-    new_rt = RefreshToken(
-        jti=new_refresh_jti,
-        user_id=decoded["sub"],
-        revoked=False,
-        expires_at=datetime.utcnow() + current_app.config["REFRESH_TOKEN_EXPIRES"]
-    )
-    storage.new(new_rt)
-    storage.save()
+    # new_rt = RefreshToken(
+    #     jti=new_re_jti,
+    #     user_id=decoded["sub"],
+    #     revoked=False,
+    #     expires_at=datetime.utcnow() + current_app.config["REFRESH_TOKEN_EXPIRES"]
+    # )
+    # storage.new(new_rt)
+    # storage.save()
 
     return jsonify(
         {
-            "access_token": new_access,
-            "refresh_token": new_refresh,
+            "jwt_token": new_jwt,
             "token_type": "bearer",
-            "expires_in": int(current_app.config["ACCESS_TOKEN_REFRESH"].total_seconds()),
+            "expires_in": int(current_app.config["JWT_TOKEN_REFRESH"].total_seconds()),
         }
     ), 200
 
 @bp.post("/logout")
+@jwt_required()
 def logout():
     """
-    logout: revokes provided refresh token (if any) and can optionally revoke the access token jti.
-    Body: { "refresh_token": "<token>" } is optional; if not provided, the server will attempt to revoke
-    by user session (if stored).
+    logout: revokes jwt_token
+    ---
+    tags:
+      - Auth
+    security:
+      - Bearer: []
+    consumes:
+      - application/json
+    parameters:
+      -  in: body
+         name: body
+         schema:
+           type: object
+           properties:
+             jwt_token: { type: string }
+    responses:
+      204:
+        description: ""
+      401:
+        description: Unauthorized
     """
     payload = request.get_json(silent=True) or {}
-    refresh_token =payload.get("refresh_token")
+    refresh_token =payload.get("jwt_token")
 
     session = storage.get_session()
 
@@ -225,55 +241,3 @@ def logout():
             storage.save()
       
         return ("", 204)
-
-@bp.get("/me")
-@jwt_required()
-def me():
-    """
-    Get current user info.
-    ---
-    tags:
-      - Auth
-    security:
-      - Bearer: []
-    responses:
-      200:
-        description: OK
-      401:
-        description: Unauthorized
-    """
-    user = g.current_user
-    return jsonify(
-        {
-            "data": user_create_schema.dump(user)
-        }
-    ), 200
-
-@bp.post("/users/<user_id>/roles")
-def set_roles(user_id: str):
-    """
-    Admin-only: set roles for a user (roles array).
-    Body: { "roles": ["admin", "author", "user"] }
-    """
-    payload = request.get_json(silent=True) or {}
-    roles = payload.get("roles")
-    if not isinstance(roles, list) or not roles:
-        abort(422, description="roles must be a non-empty list")
-    
-    session = storage.get_session()
-    user = session.query(User).get(user_id)
-    if not user:
-        abort(404)
-    
-    allowed = set(current_app.config.get("ALLOWED_ROLES", ["admin", "author", "user"]))
-    if any(r not in allowed for r in roles):
-        abort(422, description=f"Roles must be subset {allowed}")
-    
-    user.roles = roles
-    storage.new(user)
-    storage.save()
-    return jsonify(
-      {
-        "data": user_out_schema.dump(user)
-      }
-    ), 200

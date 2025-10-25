@@ -13,7 +13,7 @@ from models.schemas.author import (
     AuthorUpdateSchema,
     AuthorOutSchema,
 )
-
+from utils.decorators import roles_required
 bp = Blueprint("authors", __name__)
 
 create_schema = AuthorCreateSchema()
@@ -45,11 +45,14 @@ def parse_sort(default="name"):
 
 
 @bp.post("/authors")
+@roles_required(["admin"])
 def create_author():
     """
     Create an author
     ---
     tags: [Authors]
+    security:
+      - Bearer: []
     consumes:
       - application/json
     parameters:
@@ -145,11 +148,14 @@ def get_author(author_id: str):
 
 
 @bp.patch("/authors/<author_id>")
+@roles_required(["admin"])
 def update_author(author_id: str):
     """
     Update an author (partial)
     ---
     tags: [Authors]
+    security:
+      - Bearer: []
     parameters:
       - in: path
         name: author_id
@@ -180,11 +186,14 @@ def update_author(author_id: str):
 
 
 @bp.delete("/authors/<author_id>")
+@roles_required(["admin"])
 def delete_author(author_id: str):
     """
     Soft delete an author (sets deleted_at)
     ---
     tags: [Authors]
+    security:
+      - Bearer: []
     parameters:
       - in: path
         name: author_id
@@ -203,10 +212,13 @@ def delete_author(author_id: str):
     return ("", 204)
 
 @bp.post("/authors/<author_id>/restore")
+@roles_required(["admin"])
 def restore_author(author_id: str):
     """restores any deleted author
     ---
     tags: [Authors]
+    security:
+      - Bearer: []
     parameters:
       - in: path
         name: author_id

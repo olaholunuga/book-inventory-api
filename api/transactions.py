@@ -14,6 +14,7 @@ from models.schemas.transaction import (
     InventoryTransactionCreateSchema,
     InventoryTransactionOutSchema,
 )
+from utils.decorators import jwt_required, roles_required
 
 bp = Blueprint("transactions", __name__)
 
@@ -79,12 +80,15 @@ def normalize_reason(raw: str) -> InventoryReason:
 
 
 @bp.post("/transactions")
+@roles_required(["admin"])
 def create_transaction():
     """
     Apply an inventory transaction (adjust stock) and record it
     ---
     tags:
       - Inventory
+    security:
+      - Bearer: []
     consumes:
       - application/json
     parameters:
@@ -148,12 +152,15 @@ def create_transaction():
 
 
 @bp.get("/transactions")
+@jwt_required()
 def list_transactions():
     """
     List inventory transactions with pagination, sorting, and filters
     ---
     tags:
       - Inventory
+    security:
+      - Bearer: []
     parameters:
       - in: query
         name: page
@@ -237,12 +244,15 @@ def list_transactions():
 
 
 @bp.get("/transactions/<tx_id>")
+@jwt_required()
 def get_transaction(tx_id: str):
     """
     Get a single inventory transaction by id
     ---
     tags:
       - Inventory
+    security:
+      - Bearer: []
     parameters:
       - in: path
         name: tx_id
@@ -262,12 +272,15 @@ def get_transaction(tx_id: str):
 
 
 @bp.get("/books/<book_id>/transactions")
+@jwt_required()
 def list_transactions_for_book(book_id: str):
     """
     List inventory transactions for a specific book
     ---
     tags:
       - Inventory
+    security:
+      - Bearer: []
     parameters:
       - in: path
         name: book_id

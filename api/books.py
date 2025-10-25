@@ -6,6 +6,7 @@ from typing import List, Tuple, Optional
 from flask import Blueprint, request, jsonify, abort
 from sqlalchemy import or_, and_, func
 from marshmallow import ValidationError
+from utils.decorators import roles_required
 
 from models import storage
 from models.book import Book, book_authors, book_categories
@@ -157,12 +158,15 @@ def apply_filters(query):
 
 
 @bp.post("/books")
+@roles_required(["admin", "author"])
 def create_book():
     """
     Create a new book
     ---
     tags:
       - Books
+    security:
+      - Bearer: []
     consumes:
       - application/json
     parameters:
@@ -356,12 +360,15 @@ def get_book(book_id: str):
 
 
 @bp.patch("/books/<book_id>")
+@roles_required(["admin", "author"])
 def update_book(book_id: str):
     """
     Update a book (partial)
     ---
     tags:
       - Books
+    security:
+      - Bearer: []
     consumes:
       - application/json
     parameters:
@@ -429,12 +436,15 @@ def update_book(book_id: str):
 
 
 @bp.delete("/books/<book_id>")
+@roles_required(["author", "admin"])
 def delete_book(book_id: str):
     """
     Delete a book
     ---
     tags:
       - Books
+    security:
+      - Bearer: []
     parameters:
       - in: path
         name: book_id

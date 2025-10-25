@@ -5,6 +5,7 @@ from typing import Tuple
 from flask import Blueprint, request, jsonify, abort
 from marshmallow import ValidationError
 from sqlalchemy import func
+from utils.decorators import jwt_required
 
 from models import storage
 from models.category import Category
@@ -54,11 +55,14 @@ def exists_name_case_insensitive(session, name: str, exclude_id: str | None = No
 
 
 @bp.post("/categories")
+@jwt_required()
 def create_category():
     """
     Create a category
     ---
     tags: [Categories]
+    security:
+      - Bearer: []
     consumes: [application/json]
     parameters:
       - in: body
@@ -155,11 +159,14 @@ def get_category(category_id: str):
 
 
 @bp.patch("/categories/<category_id>")
+@jwt_required()
 def update_category(category_id: str):
     """
     Update a category (partial)
     ---
     tags: [Categories]
+    security:
+      - Bearer: []
     parameters:
       - in: path
         name: category_id
@@ -193,11 +200,14 @@ def update_category(category_id: str):
 
 
 @bp.delete("/categories/<category_id>")
+@jwt_required()
 def delete_category(category_id: str):
     """
     Soft delete a category (sets deleted_at)
     ---
     tags: [Categories]
+    security:
+      - Bearer: []
     parameters:
       - in: path
         name: category_id
@@ -215,11 +225,14 @@ def delete_category(category_id: str):
     return ("", 204)
 
 @bp.post("categories/<category_id>/restore")
+@jwt_required()
 def restore_category(category_id: str):
     """
     restores all soft-deleted categories
     ---
     tags: [Categories]
+    security:
+      - Bearer: []
     parameters:
       - in: path
         name: category_id

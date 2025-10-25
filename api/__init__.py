@@ -77,6 +77,7 @@ def create_app(config_name: str | None = None) -> Flask:
     from .categories import bp as categories_bp
     from .publishers import bp as publishers_bp
     from .auth import bp as auth_bp
+    from .users import bp as users_bp
 
     app.register_blueprint(health_bp, url_prefix="/api/v1")
     app.register_blueprint(books_bp, url_prefix="/api/v1")
@@ -85,7 +86,7 @@ def create_app(config_name: str | None = None) -> Flask:
     app.register_blueprint(categories_bp, url_prefix="/api/v1/")
     app.register_blueprint(publishers_bp, url_prefix="/api/v1/")
     app.register_blueprint(auth_bp, url_prefix="/api/v1/")
-
+    app.register_blueprint(users_bp,url_prefix="/api/v1/")
     # Ensure the DB session is removed at the end of each request/app context
     @app.teardown_appcontext
     def remove_session(exception=None):

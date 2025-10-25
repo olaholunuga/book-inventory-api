@@ -30,9 +30,38 @@ class UserUpdateSchema(Schema):
     email = fields.String(allow_none=True)
     password = fields.String(allow_none=True)
 
+    @validates("password")
+    def validate_password(self, value, **kwargs):
+        if len(value) < 8:
+            raise ValidationError("Password must be at least 8 characters long.")
+
 class UserOutSchema(Schema):
+    id = fields.String(allow_none=False)
     f_name = fields.String(allow_none=True)
     l_name = fields.String(allow_none=True)
     email = fields.String(allow_none=True)
-    admin = fields.Boolean()
-    # literary_name = fields.String(allow_none=True)
+    roles = fields.List(fields.String(allow_none=True))
+    # author = fields.String()
+    author_id = fields.Method("get_author_id")
+    literary_name = fields.String(allow_none=True)
+
+    def get_author_id(self, obj):
+        try:
+            return getattr(getattr(obj, "author", ""), "id", "")
+        except Exception:
+            return ""
+
+class UserListOutSchema(Schema):
+    id = fields.String(allow_none=False)
+    f_name = fields.String(allow_none=True)
+    l_name = fields.String(allow_none=True)
+    email = fields.String(allow_none=False)
+    roles = fields.List(fields.String(allow_none=True))
+    author_id = fields.Method("get_author_id")
+    literary_name = fields.String(allow_none=True)
+
+    def get_author_id(self, obj):
+        try:
+            return getattr(getattr(obj, "author", ""), "id", "")
+        except Exception:
+            return ""
