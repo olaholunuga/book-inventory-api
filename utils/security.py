@@ -39,24 +39,7 @@ def generate_jti() -> str:
 def _now() -> datetime:
     return datetime.utcnow()
 
-def create_access_token(subject: str, jti: str = None) -> str:
-    """
-
-    """
-    jti = jti or generate_jti()
-    exp = _now() + current_app.config["JWT_TOKEN_EXPIRES"]
-    payload = {
-        "iss": current_app.config.get("JWT_ISSUER", "book-inventory-api"),
-        "sub": str(subject),
-        "iat": int(_now().timestamp()),
-        "exp": int(exp.timestamp()),
-        "type": "access",
-        "jti": jti,
-        "roles": current_app.config.get("DEFAULT_ROLES_CLAIMS", []),
-    }
-    return jwt.encode(payload, current_app.config["JWT_SECRET"], algorithm=current_app.config["JWT_ALGORITHM"])
-
-def create_jwt_token(subject: str, jti: str = None) -> str:
+def create_jwt_token(subject: str, jti: str = None, roles: list[str] = ["user"]) -> str:
     jti = jti or generate_jti()
     exp = _now() + current_app.config["JWT_TOKEN_EXPIRES"]
     payload = {
@@ -66,6 +49,7 @@ def create_jwt_token(subject: str, jti: str = None) -> str:
         "exp": int(exp.timestamp()),
         "type": "refresh",
         "jti": jti,
+        "roles": roles,
     }
     return jwt.encode(payload, current_app.config["JWT_SECRET"], algorithm=current_app.config["JWT_ALGORITHM"])
 

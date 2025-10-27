@@ -58,7 +58,7 @@ def exists_name_case_insensitive(session, name: str, exclude_id: str | None = No
 @roles_required(["admin"])
 def create_publisher():
     """
-    Create a publisher
+    Create a publisher - admin
     ---
     tags: [Publishers]
     security:
@@ -162,7 +162,7 @@ def get_publisher(publisher_id: str):
 @roles_required(["admin"])
 def update_publisher(publisher_id: str):
     """
-    Update a publisher (partial)
+    Update a publisher (partial) - admin
     ---
     tags: [Publishers]
     security:
@@ -203,7 +203,7 @@ def update_publisher(publisher_id: str):
 @roles_required(["admin"])
 def delete_publisher(publisher_id: str):
     """
-    Soft delete a publisher (sets deleted_at)
+    Soft delete a publisher (sets deleted_at) - admin
     Note: This is a soft delete, so we do not invoke FK RESTRICT.
     Hard delete would be restricted if books reference this publisher.
     ---
@@ -231,7 +231,7 @@ def delete_publisher(publisher_id: str):
 @roles_required(["admin"])
 def restore_publisher(publisher_id: str):
     """
-    Restore a soft-deleted publisher
+    Restore a soft-deleted publisher - admin
     ---
     tags: [Publishers]
     security:

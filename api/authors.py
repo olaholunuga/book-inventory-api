@@ -48,7 +48,7 @@ def parse_sort(default="name"):
 @roles_required(["admin"])
 def create_author():
     """
-    Create an author
+    Create an author - admin only
     ---
     tags: [Authors]
     security:
@@ -151,7 +151,7 @@ def get_author(author_id: str):
 @roles_required(["admin"])
 def update_author(author_id: str):
     """
-    Update an author (partial)
+    Update an author (partial) - admin only
     ---
     tags: [Authors]
     security:
@@ -189,7 +189,7 @@ def update_author(author_id: str):
 @roles_required(["admin"])
 def delete_author(author_id: str):
     """
-    Soft delete an author (sets deleted_at)
+    Soft delete an author (sets deleted_at) - admin only
     ---
     tags: [Authors]
     security:
@@ -214,7 +214,8 @@ def delete_author(author_id: str):
 @bp.post("/authors/<author_id>/restore")
 @roles_required(["admin"])
 def restore_author(author_id: str):
-    """restores any deleted author
+    """
+    restores any deleted author - admin only
     ---
     tags: [Authors]
     security:

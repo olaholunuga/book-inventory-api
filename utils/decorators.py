@@ -35,6 +35,11 @@ def jwt_required():
     return decorator
 
 def roles_required(required_roles: list[str]):
+    """
+    Allow access if the user has ANY of the required roles.
+    Deny (403) only if there is NO overlap between user_roles and required_roles.
+    """
+    req = set(required_roles or [])
     def decorator(fn):
         @wraps(fn)
         @jwt_required()
@@ -42,7 +47,9 @@ def roles_required(required_roles: list[str]):
             user_roles = set(getattr(g, "current_user_roles", []))
 
             # required_roles = set(required_roles or [])
-            if not set(required_roles).issubset(user_roles):
+            # if not set(required_roles).issubset(user_roles):
+            # if any(role in required_roles for role in user_roles):
+            if not (user_roles & req):
                 abort(403, description="Insuficient role")
             return fn(*args, **kwargs)
         

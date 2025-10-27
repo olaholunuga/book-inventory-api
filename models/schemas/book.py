@@ -54,7 +54,8 @@ class BookBaseSchema(Schema):
 
 
 class BookCreateSchema(BookBaseSchema):
-    pass
+    author_ids = fields.List(fields.String(), load_only=True, required=False)
+    category_ids = fields.List(fields.String(), load_only=True, required=False)
 
 
 class BookUpdateSchema(Schema):

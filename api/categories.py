@@ -58,7 +58,7 @@ def exists_name_case_insensitive(session, name: str, exclude_id: str | None = No
 @jwt_required()
 def create_category():
     """
-    Create a category
+    Create a category - user
     ---
     tags: [Categories]
     security:
@@ -162,7 +162,7 @@ def get_category(category_id: str):
 @jwt_required()
 def update_category(category_id: str):
     """
-    Update a category (partial)
+    Update a category (partial) - user
     ---
     tags: [Categories]
     security:
@@ -203,7 +203,7 @@ def update_category(category_id: str):
 @jwt_required()
 def delete_category(category_id: str):
     """
-    Soft delete a category (sets deleted_at)
+    Soft delete a category (sets deleted_at) - user
     ---
     tags: [Categories]
     security:
@@ -228,7 +228,7 @@ def delete_category(category_id: str):
 @jwt_required()
 def restore_category(category_id: str):
     """
-    restores all soft-deleted categories
+    restores all soft-deleted categories - user
     ---
     tags: [Categories]
     security:

@@ -1,5 +1,5 @@
 from models.base_model import Base, BaseModel
-from sqlalchemy import Column, String, JSON
+from sqlalchemy import Column, String, JSON, text
 from sqlalchemy.orm import relationship
 
 
@@ -9,7 +9,7 @@ class User(BaseModel, Base):
     l_name = Column(String(255), nullable=True)
     email = Column(String(255), nullable=False, unique=True, index=True)
     password_hash = Column(String(100), nullable=False)
-    roles = Column(JSON, nullable=True)
+    roles = Column(JSON, nullable=True, default=lambda: ['user'])
 
     author = relationship(
         "Author",

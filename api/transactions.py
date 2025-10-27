@@ -83,7 +83,7 @@ def normalize_reason(raw: str) -> InventoryReason:
 @roles_required(["admin"])
 def create_transaction():
     """
-    Apply an inventory transaction (adjust stock) and record it
+    Apply an inventory transaction (adjust stock) and record it - admin
     ---
     tags:
       - Inventory
@@ -155,7 +155,7 @@ def create_transaction():
 @jwt_required()
 def list_transactions():
     """
-    List inventory transactions with pagination, sorting, and filters
+    List inventory transactions with pagination, sorting, and filters - user
     ---
     tags:
       - Inventory
@@ -247,7 +247,7 @@ def list_transactions():
 @jwt_required()
 def get_transaction(tx_id: str):
     """
-    Get a single inventory transaction by id
+    Get a single inventory transaction by id - user
     ---
     tags:
       - Inventory
@@ -275,7 +275,7 @@ def get_transaction(tx_id: str):
 @jwt_required()
 def list_transactions_for_book(book_id: str):
     """
-    List inventory transactions for a specific book
+    List inventory transactions for a specific book - user
     ---
     tags:
       - Inventory

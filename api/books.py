@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, date
 from typing import List, Tuple, Optional
 
-from flask import Blueprint, request, jsonify, abort
+from flask import Blueprint, request, jsonify, abort, g
 from sqlalchemy import or_, and_, func
 from marshmallow import ValidationError
 from utils.decorators import roles_required
@@ -161,7 +161,7 @@ def apply_filters(query):
 @roles_required(["admin", "author"])
 def create_book():
     """
-    Create a new book
+    Create a new book - admin and authors
     ---
     tags:
       - Books
@@ -217,7 +217,10 @@ def create_book():
         authors = session.query(Author).filter(Author.id.in_(data["author_ids"])).all()
         if len(authors) != len(set(data["author_ids"])):
             abort(400, description="One or more author_ids not found")
-
+        if "author" in g.current_user_roles and "admin" not in g.current_user_roles:
+            if not any(author_id == g.current_user.author.id for author_id in data.get("author_ids")):
+                abort(400, description="only book's author or an admin can upload book")
+    
     categories = []
     if data.get("category_ids"):
         categories = (
@@ -363,7 +366,7 @@ def get_book(book_id: str):
 @roles_required(["admin", "author"])
 def update_book(book_id: str):
     """
-    Update a book (partial)
+    Update a book (partial) - admin and author
     ---
     tags:
       - Books
@@ -439,7 +442,7 @@ def update_book(book_id: str):
 @roles_required(["author", "admin"])
 def delete_book(book_id: str):
     """
-    Delete a book
+    Delete a book - admin and author
     ---
     tags:
       - Books

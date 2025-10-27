@@ -25,7 +25,7 @@ from typing import Tuple
 from models import storage
 from models.user import User
 from models.refresh_token import RefreshToken
-from models.schemas.user import UserCreateSchema, UserOutSchema, UserLoginSchema, UserListOutSchema
+from models.schemas.user import UserCreateSchema, UserOutSchema, UserLoginSchema
 
 from utils.decorators import jwt_required, roles_required
 from utils.security import (
@@ -43,7 +43,7 @@ bp = Blueprint("auth", __name__, url_prefix="/auth")
 user_create_schema = UserCreateSchema()
 user_out_schema = UserOutSchema()
 user_login_schema = UserLoginSchema()
-user_list_out_schema = UserListOutSchema(many=True)
+user_list_out_schema = UserOutSchema(many=True)
 
 
 

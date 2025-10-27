@@ -6,11 +6,12 @@ import uuid
 from flask import Blueprint, request, jsonify, g, abort, current_app
 from marshmallow import ValidationError
 from typing import Tuple
+from sqlalchemy.orm.attributes import flag_modified
 
 from models import storage
 from models.author import Author
 from models.user import User
-from models.schemas.user import UserCreateSchema, UserOutSchema, UserListOutSchema
+from models.schemas.user import UserCreateSchema, UserOutSchema
 from utils.decorators import jwt_required, roles_required
 
 MAX_LIMIT = 100
@@ -20,7 +21,7 @@ bp = Blueprint("users", __name__)
 
 user_create_schema = UserCreateSchema()
 user_out_schema = UserOutSchema()
-user_list_out_schema = UserListOutSchema(many=True)
+user_list_out_schema = UserOutSchema(many=True)
 
 def parse_pagination() -> Tuple[int, int]:
     try:
@@ -69,7 +70,7 @@ def list_user():
 @jwt_required()
 def me():
     """
-    Get current user info.
+    Get current user info. - user
     ---
     tags:
       - Users
@@ -134,6 +135,7 @@ def set_roles(user_id: str):
         user.roles.extend(roles)
     else:
         user.roles = roles
+    flag_modified(user, "roles")
     storage.new(user)
     storage.save()
     return jsonify(
@@ -146,7 +148,7 @@ def set_roles(user_id: str):
 @roles_required(["admin"])
 def link_author(user_id):
     """
-    link user to Author
+    link user to Author - admin
     ---
     tags:
       - Users
@@ -181,12 +183,13 @@ def link_author(user_id):
     if not author:
         abort(401, description="Author does not exist")
     if user.author:
-        abort(400, description="user already linked to a author")
+        abort(409, description="user already linked to a author")
     author.user_id = user_id
     if user.roles:
         user.roles.append("author")
     else:
         user.roles = ["author"]
+    flag_modified(user, "roles")
     storage.new(user)
     storage.new(author)
     storage.save()
